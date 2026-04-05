@@ -1,6 +1,5 @@
 package bloodDonation.example.BloodDonation.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,8 +8,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "audit_logs")
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor @AllArgsConstructor
 @Builder
 public class AuditLog {
 
@@ -19,25 +17,21 @@ public class AuditLog {
     private Long id;
 
     @Column(nullable = false)
-    private String action;       // e.g. REQUEST_APPROVED, DONATION_COMPLETED
+    private String action;
 
     @Column(nullable = false)
-    private String actorId;      // Who performed the action
+    private String actorId;
 
     @Column(nullable = false)
-    private String targetId;     // What was affected
+    private String targetId;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime timestamp;
 
-    private String ipAddress;    // Optional: captured from request
-    private String details;      // Optional: additional context
+    private String details;
 
     @PrePersist
     protected void onCreate() {
         timestamp = LocalDateTime.now();
     }
-
-    // ✅ No setters on this entity — immutable by design.
-    // No update or delete operations are permitted.
 }

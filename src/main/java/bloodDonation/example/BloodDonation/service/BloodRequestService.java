@@ -2,6 +2,7 @@ package bloodDonation.example.BloodDonation.service;
 
 import bloodDonation.example.BloodDonation.dto.BloodRequestDto;
 import bloodDonation.example.BloodDonation.entity.BloodRequest;
+import bloodDonation.example.BloodDonation.entity.RequestStatus;
 import bloodDonation.example.BloodDonation.entity.User;
 import bloodDonation.example.BloodDonation.exception.BusinessException;
 import bloodDonation.example.BloodDonation.repository.BloodRequestRepository;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,20 +25,42 @@ public class BloodRequestService {
     private final BloodRequestRepository requestRepository;
     private final UserRepository userRepository;
     private final AuditService auditService;
+    private final FileStorageService fileStorageService;
 
-    // Fraud detection: max 3 requests per hour per patient
-    private static final long MAX_REQUESTS_PER_HOUR = 3;
+    // Blood group compatibility — donor blood group -> list of blood groups it can donate to
+    private static final Map<User.BloodGroup, List<User.BloodGroup>> COMPATIBILITY = Map.of(
+            User.BloodGroup.O_NEG,  List.of(
+                    User.BloodGroup.O_NEG, User.BloodGroup.O_POS,
+                    User.BloodGroup.A_NEG, User.BloodGroup.A_POS,
+                    User.BloodGroup.B_NEG, User.BloodGroup.B_POS,
+                    User.BloodGroup.AB_NEG, User.BloodGroup.AB_POS),
+            User.BloodGroup.O_POS,  List.of(
+                    User.BloodGroup.O_POS, User.BloodGroup.A_POS,
+                    User.BloodGroup.B_POS, User.BloodGroup.AB_POS),
+            User.BloodGroup.A_NEG,  List.of(
+                    User.BloodGroup.A_NEG, User.BloodGroup.A_POS,
+                    User.BloodGroup.AB_NEG, User.BloodGroup.AB_POS),
+            User.BloodGroup.A_POS,  List.of(
+                    User.BloodGroup.A_POS, User.BloodGroup.AB_POS),
+            User.BloodGroup.B_NEG,  List.of(
+                    User.BloodGroup.B_NEG, User.BloodGroup.B_POS,
+                    User.BloodGroup.AB_NEG, User.BloodGroup.AB_POS),
+            User.BloodGroup.B_POS,  List.of(
+                    User.BloodGroup.B_POS, User.BloodGroup.AB_POS),
+            User.BloodGroup.AB_NEG, List.of(
+                    User.BloodGroup.AB_NEG, User.BloodGroup.AB_POS),
+            User.BloodGroup.AB_POS, List.of(
+                    User.BloodGroup.AB_POS)
+    );
+
+    public static boolean canDonate(User.BloodGroup donor, User.BloodGroup recipient) {
+        List<User.BloodGroup> compatible = COMPATIBILITY.get(donor);
+        return compatible != null && compatible.contains(recipient);
+    }
 
     @Transactional
     public BloodRequestDto.BloodRequestResponse createRequest(BloodRequestDto.CreateRequest dto) {
         User patient = getAuthenticatedUser();
-
-        // Fraud detection: throttle excessive requests
-        long recentCount = requestRepository.countRecentRequestsByPatient(patient.getId());
-        if (recentCount >= MAX_REQUESTS_PER_HOUR) {
-            auditService.log("FRAUD_TOO_MANY_REQUESTS", patient.getId().toString(), "SYSTEM");
-            throw new BusinessException("Too many requests submitted in a short period. Please wait.");
-        }
 
         BloodRequest request = BloodRequest.builder()
                 .patient(patient)
@@ -44,111 +68,53 @@ public class BloodRequestService {
                 .hospitalName(dto.getHospitalName())
                 .hospitalAddress(dto.getHospitalAddress())
                 .unitsRequired(dto.getUnitsRequired())
+                .status(RequestStatus.PENDING)
                 .build();
 
         BloodRequest saved = requestRepository.save(request);
         auditService.log("REQUEST_CREATED", patient.getId().toString(), saved.getId().toString());
-
         return mapToResponse(saved);
     }
 
     @Transactional
-    public BloodRequestDto.BloodRequestResponse uploadDocuments(
-            Long requestId, MultipartFile prescription, MultipartFile hospitalProof) {
+    public void uploadDocuments(Long requestId, MultipartFile prescription, MultipartFile hospitalProof) {
+        BloodRequest request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new BusinessException("Request not found"));
 
-        BloodRequest request = getRequestById(requestId);
-        User patient = getAuthenticatedUser();
+        String presUrl = fileStorageService.storeFile(prescription, "prescriptions");
+        String hospUrl = fileStorageService.storeFile(hospitalProof, "hospital");
 
-        if (!request.getPatient().getId().equals(patient.getId())) {
-            throw new BusinessException("You can only upload documents for your own requests");
-        }
+        request.setPrescriptionDocUrl(presUrl);
+        request.setHospitalProofUrl(hospUrl);
+        request.setHasDocuments(true);
+        requestRepository.save(request);
+    }
 
-        if (request.getStatus() != BloodRequest.RequestStatus.PENDING) {
-            throw new BusinessException("Documents can only be uploaded for PENDING requests");
-        }
-
-        // In production: upload to S3/Cloudinary and store URL
-        // Simulated here — replace with actual cloud storage service
-        String prescriptionUrl = "/uploads/" + requestId + "/prescription_" + prescription.getOriginalFilename();
-        String hospitalProofUrl = "/uploads/" + requestId + "/hospital_" + hospitalProof.getOriginalFilename();
-
-        request.setPrescriptionDocUrl(prescriptionUrl);
-        request.setHospitalProofUrl(hospitalProofUrl);
-
-        BloodRequest saved = requestRepository.save(request);
-        auditService.log("DOCUMENTS_UPLOADED", patient.getId().toString(), requestId.toString());
-
-        return mapToResponse(saved);
+    @Transactional
+    public void verifyDocuments(Long requestId) {
+        BloodRequest request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new BusinessException("Request not found"));
+        request.setDocumentsVerified(true);
+        requestRepository.save(request);
     }
 
     @Transactional
     public BloodRequestDto.BloodRequestResponse approveRequest(Long requestId) {
         User doctor = getAuthenticatedUser();
-
-        // Enforce: only verified doctors can approve
-        if (!doctor.isVerifiedDoctor()) {
-            throw new BusinessException("Only admin-verified doctors can approve blood requests");
-        }
-
         BloodRequest request = getRequestById(requestId);
-
-        // Enforce the trust rule: no docs = no approval
-        if (!request.canBeApproved()) {
-            throw new BusinessException(
-                    "Request cannot be approved: documents must be uploaded and verified first");
-        }
-
-        request.setStatus(BloodRequest.RequestStatus.APPROVED);
-        request.setApprovedBy(doctor);
-
+        request.setStatus(RequestStatus.APPROVED);
         BloodRequest saved = requestRepository.save(request);
         auditService.log("REQUEST_APPROVED", doctor.getId().toString(), requestId.toString());
-
-        log.info("Request {} approved by doctor {}", requestId, doctor.getId());
         return mapToResponse(saved);
     }
 
     @Transactional
     public BloodRequestDto.BloodRequestResponse rejectRequest(Long requestId, String reason) {
-        User doctor = getAuthenticatedUser();
-
-        if (!doctor.isVerifiedDoctor()) {
-            throw new BusinessException("Only admin-verified doctors can reject blood requests");
-        }
-
         BloodRequest request = getRequestById(requestId);
-
-        if (request.getStatus() != BloodRequest.RequestStatus.PENDING) {
-            throw new BusinessException("Only PENDING requests can be rejected");
-        }
-
-        request.setStatus(BloodRequest.RequestStatus.REJECTED);
+        request.setStatus(RequestStatus.REJECTED);
         request.setRejectionReason(reason);
-
         BloodRequest saved = requestRepository.save(request);
-        auditService.log("REQUEST_REJECTED", doctor.getId().toString(), requestId.toString());
-
-        return mapToResponse(saved);
-    }
-
-    @Transactional
-    public BloodRequestDto.BloodRequestResponse verifyDocuments(Long requestId) {
-        User doctor = getAuthenticatedUser();
-
-        if (!doctor.isVerifiedDoctor()) {
-            throw new BusinessException("Only verified doctors can verify documents");
-        }
-
-        BloodRequest request = getRequestById(requestId);
-
-        if (request.getPrescriptionDocUrl() == null || request.getHospitalProofUrl() == null) {
-            throw new BusinessException("Documents have not been uploaded yet");
-        }
-
-        request.setDocumentsVerified(true);
-        BloodRequest saved = requestRepository.save(request);
-        auditService.log("DOCUMENTS_VERIFIED", doctor.getId().toString(), requestId.toString());
-
+        auditService.log("REQUEST_REJECTED", "SYSTEM", requestId.toString());
         return mapToResponse(saved);
     }
 
@@ -156,40 +122,60 @@ public class BloodRequestService {
     public List<BloodRequestDto.BloodRequestResponse> getMyRequests() {
         User user = getAuthenticatedUser();
         return requestRepository.findByPatientIdOrderByCreatedAtDesc(user.getId())
-                .stream().map(this::mapToResponse).toList();
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Transactional(readOnly = true)
     public List<BloodRequestDto.BloodRequestResponse> getPendingRequests() {
-        return requestRepository.findVerifiedPendingRequests()
-                .stream().map(this::mapToResponse).toList();
+        return requestRepository.findByStatus(RequestStatus.PENDING)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<BloodRequestDto.BloodRequestResponse> getApprovedRequests() {
+        User donor = getAuthenticatedUser();
+        User.BloodGroup donorBlood = donor.getBloodGroup();
+
+        return requestRepository.findByStatus(RequestStatus.APPROVED)
+                .stream()
+                // Only show requests this donor's blood group is compatible with
+                .filter(r -> canDonate(donorBlood, r.getBloodGroup()))
+                .map(this::mapToResponse)
+                .toList();
     }
 
     private BloodRequest getRequestById(Long id) {
         return requestRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Blood request not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("Blood request not found: " + id));
     }
 
     private User getAuthenticatedUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new BusinessException("Authenticated user not found"));
+                .orElseThrow(() -> new BusinessException("User not found"));
     }
 
-    public BloodRequestDto.BloodRequestResponse mapToResponse(BloodRequest request) {
+    public BloodRequestDto.BloodRequestResponse mapToResponse(BloodRequest r) {
         BloodRequestDto.BloodRequestResponse res = new BloodRequestDto.BloodRequestResponse();
-        res.setId(request.getId());
-        res.setPatientId(request.getPatient().getId());
-        res.setPatientName(request.getPatient().getFullName());
-        res.setBloodGroup(request.getBloodGroup());
-        res.setStatus(request.getStatus());
-        res.setHospitalName(request.getHospitalName());
-        res.setHospitalAddress(request.getHospitalAddress());
-        res.setUnitsRequired(request.getUnitsRequired());
-        res.setDocumentsVerified(request.isDocumentsVerified());
-        res.setRejectionReason(request.getRejectionReason());
-        res.setCreatedAt(request.getCreatedAt());
-        res.setUpdatedAt(request.getUpdatedAt());
+        res.setId(r.getId());
+        res.setPatientId(r.getPatient().getId());
+        res.setPatientName(r.getPatient().getFullName());
+        res.setBloodGroup(r.getBloodGroup());
+        res.setStatus(r.getStatus());
+        res.setHospitalName(r.getHospitalName());
+        res.setHospitalAddress(r.getHospitalAddress());
+        res.setUnitsRequired(r.getUnitsRequired());
+        res.setHasDocuments(r.isHasDocuments());
+        res.setDocumentsVerified(r.isDocumentsVerified());
+        res.setPrescriptionDocUrl(r.getPrescriptionDocUrl());
+        res.setHospitalProofUrl(r.getHospitalProofUrl());
+        res.setRejectionReason(r.getRejectionReason());
+        res.setCreatedAt(r.getCreatedAt());
+        res.setUpdatedAt(r.getUpdatedAt());
         return res;
     }
 }

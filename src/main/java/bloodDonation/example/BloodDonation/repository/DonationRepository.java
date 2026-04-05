@@ -13,11 +13,13 @@ public interface DonationRepository extends JpaRepository<Donation, Long> {
 
     List<Donation> findByDonorIdOrderByCreatedAtDesc(Long donorId);
 
-    Optional<Donation> findByBloodRequestId(Long requestId);
+    Optional<Donation> findByRequestId(Long requestId);
+
+    Optional<Donation> findByRequestIdAndStatusNot(Long requestId, Donation.DonationStatus status);
 
     @Query("SELECT COUNT(d) FROM Donation d WHERE d.donor.id = :donorId AND d.status = 'COMPLETED'")
     long countCompletedByDonor(Long donorId);
 
-    @Query("SELECT d FROM Donation d WHERE d.status = 'SCHEDULED' AND d.collectorOtpVerified = false")
+    @Query("SELECT d FROM Donation d WHERE d.status = 'SCHEDULED'")
     List<Donation> findScheduledUnverifiedDonations();
 }

@@ -5,9 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-import jakarta.validation.constraints.Pattern;
-
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,24 +15,37 @@ public class UserDto {
     @Data
     public static class RegisterRequest {
         @NotBlank
-        @Email
-        private String email;
-
-        @NotBlank @Size(min = 8, message = "Password must be at least 8 characters")
-        private String password;
-
-        @NotBlank
         private String fullName;
 
-        @NotBlank @Pattern(regexp = "^[6-9]\\d{9}$", message = "Invalid Indian phone number")
+        @NotBlank @Email
+        private String email;
+
+        @NotBlank
         private String phone;
+
+        @NotBlank @Size(min = 8)
+        private String password;
 
         @NotNull
         private User.Role role;
 
-        private User.BloodGroup bloodGroup; // Required for DONOR
+        private User.BloodGroup bloodGroup;
 
-        private String aadhaar; // Will be hashed before storage
+        private String aadhaar;
+    }
+
+    @Data
+    public static class UpdateProfileRequest {
+        @NotBlank
+        private String fullName;
+        private User.BloodGroup bloodGroup;
+    }
+
+    @Data
+    public static class VerifyDoctorRequest {
+        @NotNull
+        private Long doctorId;
+        private boolean approved;
     }
 
     @Data
@@ -46,28 +57,8 @@ public class UserDto {
         private User.Role role;
         private User.BloodGroup bloodGroup;
         private boolean emailVerified;
-        private boolean phoneVerified;
         private boolean adminVerified;
         private LocalDate nextEligibleDonationDate;
         private LocalDateTime createdAt;
-    }
-
-    @Data
-    public static class UpdateProfileRequest {
-        @NotBlank
-        private String fullName;
-
-        private User.BloodGroup bloodGroup;
-    }
-
-    @Data
-    public static class VerifyDoctorRequest {
-        @NotNull
-        private Long doctorId;
-
-        @NotNull
-        private boolean approved;
-
-        private String rejectionReason;
     }
 }

@@ -1,11 +1,10 @@
 package bloodDonation.example.BloodDonation.entity;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -13,53 +12,35 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 @Builder
 public class User implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
     private String email;
-
-    @Column(nullable = false)
     private String password;
-
-    @Column(nullable = false)
     private String fullName;
-
-    @Column(nullable = false, unique = true)
     private String phone;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Role role;
 
     @Enumerated(EnumType.STRING)
     private BloodGroup bloodGroup;
 
-    // Hashed Aadhaar - never stored in plain text
-    @Column(name = "aadhaar_hash")
-    private String aadhaarHash;
-
+    @Builder.Default
     private boolean emailVerified = false;
-    private boolean phoneVerified = false;
-    private boolean adminVerified = false; // For doctors
+    @Builder.Default
+    private boolean adminVerified = false;
+    @Builder.Default
     private boolean accountLocked = false;
-    private int failedVerificationAttempts = 0;
 
-    @Column(name = "next_eligible_donation_date")
     private LocalDate nextEligibleDonationDate;
-
-    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @PrePersist
@@ -67,13 +48,6 @@ public class User implements UserDetails {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-
-    // --- UserDetails methods ---
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -86,34 +60,52 @@ public class User implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonExpired() { return true; }
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
     @Override
-    public boolean isAccountNonLocked() { return !accountLocked; }
+    public boolean isAccountNonLocked() {
+        return !accountLocked;
+    }
 
     @Override
-    public boolean isCredentialsNonExpired() { return true; }
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
     @Override
-    public boolean isEnabled() { return emailVerified; }
+    public boolean isEnabled() {
+        return emailVerified;
+    }
 
     public boolean isDonorEligible() {
         return nextEligibleDonationDate == null ||
-                !LocalDate.now().isBefore(nextEligibleDonationDate);
+                !java.time.LocalDate.now().isBefore(nextEligibleDonationDate);
     }
 
     public boolean isVerifiedDoctor() {
         return role == Role.DOCTOR && adminVerified;
     }
 
-    public enum Role {
-        ADMIN, DOCTOR, DONOR, PATIENT
-    }
+    public enum Role {ADMIN, DOCTOR, DONOR, PATIENT}
 
     public enum BloodGroup {
-        A_POSITIVE, A_NEGATIVE,
-        B_POSITIVE, B_NEGATIVE,
-        AB_POSITIVE, AB_NEGATIVE,
-        O_POSITIVE, O_NEGATIVE
+        O_NEG, A_NEG, B_NEG, O_POS, A_POS, B_POS, AB_NEG, AB_POS;
+
+        @JsonCreator
+        public static BloodGroup fromString(String value) {
+            return switch (value.toUpperCase()) {
+                case "B_POSITIVE", "B_POS" -> B_POS;
+                case "A_POSITIVE", "A_POS" -> A_POS;
+                case "O_POSITIVE", "O_POS" -> O_POS;
+                case "AB_POSITIVE", "AB_POS" -> AB_POS;
+                case "B_NEGATIVE", "B_NEG" -> B_NEG;
+                case "A_NEGATIVE", "A_NEG" -> A_NEG;
+                case "O_NEGATIVE", "O_NEG" -> O_NEG;
+                case "AB_NEGATIVE", "AB_NEG" -> AB_NEG;
+                default -> throw new IllegalArgumentException("Invalid blood group: " + value);
+            };
+        }
     }
 }

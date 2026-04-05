@@ -2,7 +2,9 @@ package bloodDonation.example.BloodDonation.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public class AuthDto {
 
@@ -16,33 +18,12 @@ public class AuthDto {
     }
 
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class LoginResponse {
         private String token;
-        private String tokenType = "Bearer";
         private String email;
         private String role;
-        private long expiresIn;
-
-        public LoginResponse(String token, String email, String role, long expiresIn) {
-            this.token = token;
-            this.email = email;
-            this.role = role;
-            this.expiresIn = expiresIn;
-        }
-    }
-
-    @Data
-    public static class OtpVerifyRequest {
-        @NotBlank
-        private String phone;
-
-        @NotBlank
-        private String otp;
-    }
-
-    @Data
-    public static class EmailVerifyRequest {
-        @NotBlank
-        private String token;
+        private long expiresInSeconds;
     }
 }

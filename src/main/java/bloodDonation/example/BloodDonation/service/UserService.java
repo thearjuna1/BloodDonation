@@ -86,19 +86,6 @@ public class UserService {
                 .stream().map(this::mapToResponse).toList();
     }
 
-    @Transactional
-    public void incrementFailedVerification(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException("User not found"));
-        user.setFailedVerificationAttempts(user.getFailedVerificationAttempts() + 1);
-
-        if (user.getFailedVerificationAttempts() >= 5) {
-            user.setAccountLocked(true);
-            auditService.log("ACCOUNT_LOCKED_FRAUD", "SYSTEM", user.getId().toString());
-            log.warn("Account locked for user {} due to repeated verification failures", userId);
-        }
-        userRepository.save(user);
-    }
 
     public String hashSensitiveData(String rawData) {
         try {
@@ -119,7 +106,6 @@ public class UserService {
         res.setRole(user.getRole());
         res.setBloodGroup(user.getBloodGroup());
         res.setEmailVerified(user.isEmailVerified());
-        res.setPhoneVerified(user.isPhoneVerified());
         res.setAdminVerified(user.isAdminVerified());
         res.setNextEligibleDonationDate(user.getNextEligibleDonationDate());
         res.setCreatedAt(user.getCreatedAt());
