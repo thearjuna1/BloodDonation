@@ -260,7 +260,7 @@
         .modal-overlay.active { opacity:1; pointer-events:all; }
         .modal {
           background:var(--white); border-radius:var(--radius-xl);
-          width:100%; max-width:500px; max-height:90vh; overflow-y:auto;
+          width:100%; max-width:520px; max-height:90vh; overflow-y:auto;
           box-shadow:var(--shadow-xl);
           transform:translateY(28px) scale(0.96);
           transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
@@ -344,6 +344,17 @@
         .toast.error { background:var(--crimson); }
         .toast.warning { background:var(--warning); }
         .toast-icon { font-size:1rem; flex-shrink:0; }
+
+        /* ===================== FILE UPLOAD ===================== */
+        .file-zone {
+          border:2px dashed var(--bone); border-radius:var(--radius-lg); padding:20px 16px;
+          text-align:center; cursor:pointer; transition:all var(--transition); background:var(--ivory);
+        }
+        .file-zone:hover { border-color:var(--crimson); background:rgba(192,21,42,0.03); }
+        .file-zone.has-file { border-color:var(--success); background:var(--success-bg); }
+        .file-zone-icon { font-size:1.6rem; margin-bottom:6px; }
+        .file-zone-text { font-size:0.78rem; color:var(--muted); line-height:1.5; }
+        .file-zone-name { font-size:0.78rem; color:var(--success); font-weight:600; margin-top:6px; }
 
         /* ===================== DASHBOARD ===================== */
         #dashboard-view { display:none; min-height:100vh; padding-top:68px; background:var(--ivory); }
@@ -466,17 +477,6 @@
         .btn-sm-warning:hover { background:#925008; }
         .btn-sm-danger { background:var(--crimson); color:white; }
         .btn-sm-danger:hover { background:var(--crimson-dark); }
-
-        /* ===================== FILE UPLOAD ===================== */
-        .file-zone {
-          border:2px dashed var(--bone); border-radius:var(--radius-lg); padding:28px 20px;
-          text-align:center; cursor:pointer; transition:all var(--transition); background:var(--ivory);
-        }
-        .file-zone:hover { border-color:var(--crimson); background:rgba(192,21,42,0.03); }
-        .file-zone.has-file { border-color:var(--success); background:var(--success-bg); }
-        .file-zone-icon { font-size:2rem; margin-bottom:8px; }
-        .file-zone-text { font-size:0.81rem; color:var(--muted); line-height:1.5; }
-        .file-zone-name { font-size:0.81rem; color:var(--success); font-weight:600; margin-top:8px; }
 
         /* ===================== PROFILE ===================== */
         .profile-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
@@ -703,46 +703,14 @@
         <div class="section-title">Current Demand by Blood Group</div>
         <p class="section-sub">Rare types are always in critical need. Register today to make a difference.</p>
         <div class="blood-grid">
-            <div class="blood-card">
-                <div class="blood-type">O−</div>
-                <div class="blood-compat">Universal Donor · Accepted by all blood types</div>
-                <span class="blood-demand demand-critical">⚠ Critical Need</span>
-            </div>
-            <div class="blood-card">
-                <div class="blood-type">O+</div>
-                <div class="blood-compat">Compatible with A+, B+, O+, AB+</div>
-                <span class="blood-demand demand-high">High Demand</span>
-            </div>
-            <div class="blood-card">
-                <div class="blood-type">A+</div>
-                <div class="blood-compat">Most common type · Wide compatibility</div>
-                <span class="blood-demand demand-med">Moderate</span>
-            </div>
-            <div class="blood-card">
-                <div class="blood-type">A−</div>
-                <div class="blood-compat">Compatible with A and AB types</div>
-                <span class="blood-demand demand-high">High Demand</span>
-            </div>
-            <div class="blood-card">
-                <div class="blood-type">B+</div>
-                <div class="blood-compat">Compatible with B+ and AB+</div>
-                <span class="blood-demand demand-med">Moderate</span>
-            </div>
-            <div class="blood-card">
-                <div class="blood-type">B−</div>
-                <div class="blood-compat">Rare type — needed everywhere urgently</div>
-                <span class="blood-demand demand-critical">⚠ Critical Need</span>
-            </div>
-            <div class="blood-card">
-                <div class="blood-type">AB+</div>
-                <div class="blood-compat">Universal Recipient · Can receive from all</div>
-                <span class="blood-demand demand-low">Adequate</span>
-            </div>
-            <div class="blood-card">
-                <div class="blood-type">AB−</div>
-                <div class="blood-compat">Universal Plasma Donor · Very rare</div>
-                <span class="blood-demand demand-high">High Demand</span>
-            </div>
+            <div class="blood-card"><div class="blood-type">O−</div><div class="blood-compat">Universal Donor · Accepted by all blood types</div><span class="blood-demand demand-critical">⚠ Critical Need</span></div>
+            <div class="blood-card"><div class="blood-type">O+</div><div class="blood-compat">Compatible with A+, B+, O+, AB+</div><span class="blood-demand demand-high">High Demand</span></div>
+            <div class="blood-card"><div class="blood-type">A+</div><div class="blood-compat">Most common type · Wide compatibility</div><span class="blood-demand demand-med">Moderate</span></div>
+            <div class="blood-card"><div class="blood-type">A−</div><div class="blood-compat">Compatible with A and AB types</div><span class="blood-demand demand-high">High Demand</span></div>
+            <div class="blood-card"><div class="blood-type">B+</div><div class="blood-compat">Compatible with B+ and AB+</div><span class="blood-demand demand-med">Moderate</span></div>
+            <div class="blood-card"><div class="blood-type">B−</div><div class="blood-compat">Rare type — needed everywhere urgently</div><span class="blood-demand demand-critical">⚠ Critical Need</span></div>
+            <div class="blood-card"><div class="blood-type">AB+</div><div class="blood-compat">Universal Recipient · Can receive from all</div><span class="blood-demand demand-low">Adequate</span></div>
+            <div class="blood-card"><div class="blood-type">AB−</div><div class="blood-compat">Universal Plasma Donor · Very rare</div><span class="blood-demand demand-high">High Demand</span></div>
         </div>
     </section>
 
@@ -762,28 +730,18 @@
             </div>
             <div class="footer-col">
                 <h4>For Donors</h4>
-                <a href="#">Eligibility Check</a>
-                <a href="#">Donation Process</a>
-                <a href="#">Your Impact</a>
-                <a href="#">FAQ</a>
+                <a href="#">Eligibility Check</a><a href="#">Donation Process</a><a href="#">Your Impact</a><a href="#">FAQ</a>
             </div>
             <div class="footer-col">
                 <h4>For Patients</h4>
-                <a href="#">Submit Request</a>
-                <a href="#">Required Documents</a>
-                <a href="#">Emergency Help</a>
-                <a href="#">Track Request</a>
+                <a href="#">Submit Request</a><a href="#">Required Documents</a><a href="#">Emergency Help</a><a href="#">Track Request</a>
             </div>
             <div class="footer-col">
                 <h4>Platform</h4>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Security</a>
-                <a href="#">API Docs</a>
-                <a href="#">Contact Us</a>
+                <a href="#">Privacy Policy</a><a href="#">Security</a><a href="#">API Docs</a><a href="#">Contact Us</a>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>© 2025 HaemaLink. All rights reserved.</span>
             <span>Built with <span class="footer-heart">❤</span> for India's blood crisis</span>
         </div>
     </footer>
@@ -801,7 +759,6 @@
             <nav class="sidebar-nav" id="sidebar-nav"></nav>
         </aside>
         <main class="dash-main">
-
             <!-- OVERVIEW -->
             <div class="dash-page active" id="page-overview">
                 <div class="page-header">
@@ -828,7 +785,7 @@
                     <button class="btn-primary" onclick="openCreateRequestModal()">+ New Blood Request</button>
                 </div>
                 <div class="request-list" id="my-requests-list">
-                    <div class="empty-state"><span class="empty-icon">🩸</span><div class="empty-text">No requests yet.<br>Click "+ New Blood Request" to get started.</div></div>
+                    <div class="empty-state"><span class="empty-icon">🩸</span><div class="empty-text">No requests yet.</div></div>
                 </div>
             </div>
 
@@ -839,7 +796,7 @@
                     <div class="page-sub">Your complete donation history</div>
                 </div>
                 <div class="request-list" id="my-donations-list">
-                    <div class="empty-state"><span class="empty-icon">❤️</span><div class="empty-text">No donations yet.<br>Find a request to donate to.</div></div>
+                    <div class="empty-state"><span class="empty-icon">❤️</span><div class="empty-text">No donations yet.</div></div>
                 </div>
             </div>
 
@@ -851,7 +808,7 @@
                 </div>
                 <div id="donor-eligibility-banner"></div>
                 <div class="request-list" id="available-list">
-                    <div class="empty-state"><span class="empty-icon">🔍</span><div class="empty-text">No approved requests available right now.<br>Check back soon.</div></div>
+                    <div class="empty-state"><span class="empty-icon">🔍</span><div class="empty-text">No approved requests available right now.</div></div>
                 </div>
             </div>
 
@@ -870,7 +827,7 @@
             <div class="dash-page" id="page-pending-doctors">
                 <div class="page-header">
                     <div class="page-title">Doctor Verification</div>
-                    <div class="page-sub">Review and verify medical professionals before they can approve requests</div>
+                    <div class="page-sub">Review uploaded credentials and approve or reject doctor registrations</div>
                 </div>
                 <div class="request-list" id="pending-doctors-list">
                     <div class="empty-state"><span class="empty-icon">👨‍⚕️</span><div class="empty-text">No pending doctor verifications</div></div>
@@ -906,7 +863,6 @@
                     <button class="btn-primary" onclick="updateProfile()" style="margin-top:8px">Save Changes</button>
                 </div>
             </div>
-
         </main>
     </div>
 </div>
@@ -991,11 +947,34 @@
                         <input type="password" id="reg-confirm" placeholder="Repeat password">
                     </div>
                 </div>
-                <div id="doctor-note" style="display:none">
-                    <div class="alert alert-info" style="margin-bottom:0">
-                        👨‍⚕️ Doctor accounts require admin approval before you can review requests.
+
+                <!-- DOCTOR-ONLY SECTION — shown when role = DOCTOR -->
+                <div id="doctor-fields" style="display:none">
+                    <div class="alert alert-info" style="margin-bottom:14px">
+                        👨‍⚕️ Doctor accounts require admin approval before you can review requests. Please upload your credentials below.
+                    </div>
+                    <div class="form-group">
+                        <label>Medical Licence</label>
+                        <div class="file-zone" id="licence-zone" onclick="document.getElementById('reg-licence-file').click()">
+                            <div class="file-zone-icon">📜</div>
+                            <div class="file-zone-text">Click to upload medical licence<br><small>PDF, JPG, PNG — max 10MB</small></div>
+                            <div class="file-zone-name" id="licence-name" style="display:none"></div>
+                        </div>
+                        <input type="file" id="reg-licence-file" style="display:none" accept=".pdf,.jpg,.jpeg,.png"
+                               onchange="handleRegFile(this,'licence')">
+                    </div>
+                    <div class="form-group">
+                        <label>Degree Certificate</label>
+                        <div class="file-zone" id="degree-zone" onclick="document.getElementById('reg-degree-file').click()">
+                            <div class="file-zone-icon">🎓</div>
+                            <div class="file-zone-text">Click to upload degree certificate<br><small>PDF, JPG, PNG — max 10MB</small></div>
+                            <div class="file-zone-name" id="degree-name" style="display:none"></div>
+                        </div>
+                        <input type="file" id="reg-degree-file" style="display:none" accept=".pdf,.jpg,.jpeg,.png"
+                               onchange="handleRegFile(this,'degree')">
                     </div>
                 </div>
+
                 <button class="btn-full" id="register-btn" onclick="doRegister()" style="margin-top:14px">Create Account</button>
                 <p class="form-hint" style="text-align:center;margin-top:12px">By registering you agree to our Privacy Policy and Terms of Service</p>
             </div>
@@ -1040,7 +1019,7 @@
                 <input type="text" id="cr-address" placeholder="Full address with city and state">
             </div>
             <div class="alert alert-info" style="margin-bottom:14px">
-                📋 After submitting, you'll need to upload your prescription and hospital admission proof for doctor review.
+                📋 After submitting, upload your prescription and hospital admission proof for doctor review.
             </div>
             <button class="btn-full" id="create-request-btn" onclick="createBloodRequest()">Submit Request</button>
         </div>
@@ -1120,36 +1099,17 @@
     /* ============================================================
        UTILS
     ============================================================ */
-  async function apiFetch(path, opts = {}) {
-    const headers = { ...(opts.headers || {}) };
-
-    if (!opts.isMultipart) {
-        headers['Content-Type'] = 'application/json';
+    async function apiFetch(path, opts = {}) {
+        const headers = { ...(opts.headers || {}) };
+        if (!opts.isMultipart) headers['Content-Type'] = 'application/json';
+        if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
+        const res = await fetch(API + path, { ...opts, headers });
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); } catch { data = { message: text }; }
+        if (!res.ok) throw new Error(data.message || data.error || 'Request failed');
+        return data;
     }
-
-    if (authToken) {
-        headers['Authorization'] = 'Bearer ' + authToken;
-    }
-
-    const res = await fetch(API + path, { ...opts, headers });
-
-    const text = await res.text();
-
-    let data;
-    try {
-        data = JSON.parse(text);
-    } catch {
-        data = { message: text };
-    }
-
-    if (!res.ok) {
-        throw new Error(data.message || data.error || 'Request failed');
-    }
-
-    return data;
-}
-
-
 
     function showToast(msg, type = 'default') {
         const t = document.getElementById('toast');
@@ -1206,18 +1166,12 @@
         document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 10);
     });
 
-    function toggleMenu() {
-        document.getElementById('nav-links').classList.toggle('open');
-    }
-
-    function closeMobileMenu() {
-        document.getElementById('nav-links').classList.remove('open');
-    }
+    function toggleMenu() { document.getElementById('nav-links').classList.toggle('open'); }
+    function closeMobileMenu() { document.getElementById('nav-links').classList.remove('open'); }
 
     function goHome() {
-        if (currentUser) {
-            showDashboard();
-        } else {
+        if (currentUser) { showDashboard(); }
+        else {
             document.getElementById('public-view').style.display = 'block';
             document.getElementById('dashboard-view').classList.remove('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1228,13 +1182,7 @@
        SMART CTA HANDLERS
     ============================================================ */
     function handleDonorCTA() {
-        if (!currentUser) {
-            switchTab('register');
-            document.getElementById('reg-role').value = 'DONOR';
-            handleRoleChange();
-            document.getElementById('auth-modal').classList.add('active');
-            return;
-        }
+        if (!currentUser) { switchTab('register'); document.getElementById('reg-role').value = 'DONOR'; handleRoleChange(); document.getElementById('auth-modal').classList.add('active'); return; }
         showDashboard();
         if (currentUser.role === 'DONOR') navigateDash('available');
         else if (currentUser.role === 'PATIENT') navigateDash('my-requests');
@@ -1242,13 +1190,7 @@
     }
 
     function handlePatientCTA() {
-        if (!currentUser) {
-            switchTab('register');
-            document.getElementById('reg-role').value = 'PATIENT';
-            handleRoleChange();
-            document.getElementById('auth-modal').classList.add('active');
-            return;
-        }
+        if (!currentUser) { switchTab('register'); document.getElementById('reg-role').value = 'PATIENT'; handleRoleChange(); document.getElementById('auth-modal').classList.add('active'); return; }
         showDashboard();
         if (currentUser.role === 'PATIENT') navigateDash('my-requests');
         else if (currentUser.role === 'DONOR') navigateDash('available');
@@ -1264,9 +1206,7 @@
         document.getElementById('auth-modal').classList.add('active');
     }
 
-    function closeModal(id) {
-        document.getElementById(id).classList.remove('active');
-    }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
     document.querySelectorAll('.modal-overlay').forEach(el => {
         el.addEventListener('click', e => { if (e.target === el) el.classList.remove('active'); });
@@ -1286,8 +1226,18 @@
     function handleRoleChange() {
         const role = document.getElementById('reg-role').value;
         document.getElementById('blood-group-field').style.display = role === 'DONOR' ? 'block' : 'none';
-        const doctorNote = document.getElementById('doctor-note');
-        if (doctorNote) doctorNote.style.display = role === 'DOCTOR' ? 'block' : 'none';
+        document.getElementById('doctor-fields').style.display = role === 'DOCTOR' ? 'block' : 'none';
+    }
+
+    // Handle file picks inside registration form
+    function handleRegFile(input, type) {
+        const file = input.files[0];
+        if (!file) return;
+        const zone = document.getElementById(type === 'licence' ? 'licence-zone' : 'degree-zone');
+        const name = document.getElementById(type === 'licence' ? 'licence-name' : 'degree-name');
+        zone.classList.add('has-file');
+        name.style.display = 'block';
+        name.textContent = '✓ ' + file.name;
     }
 
     /* ============================================================
@@ -1307,7 +1257,6 @@
             closeModal('auth-modal');
             await loadCurrentUser();
             showDashboard();
-            // Route to most useful page per role
             const routes = { PATIENT: 'my-requests', DONOR: 'available', DOCTOR: 'pending-requests', ADMIN: 'pending-doctors' };
             if (routes[currentUser?.role]) navigateDash(routes[currentUser.role]);
             showToast('Welcome back, ' + (currentUser?.fullName?.split(' ')[0] || '') + '! 👋', 'success');
@@ -1320,19 +1269,60 @@
 
     async function doRegister() {
         clearAlert('register-alert');
-        const name = document.getElementById('reg-name').value.trim();
-        const role = document.getElementById('reg-role').value;
-        const email = document.getElementById('reg-email').value.trim();
-        const phone = document.getElementById('reg-phone').value.trim();
-        const blood = document.getElementById('reg-blood').value;
+        const name     = document.getElementById('reg-name').value.trim();
+        const role     = document.getElementById('reg-role').value;
+        const email    = document.getElementById('reg-email').value.trim();
+        const phone    = document.getElementById('reg-phone').value.trim();
+        const blood    = document.getElementById('reg-blood').value;
         const password = document.getElementById('reg-password').value;
-        const confirm = document.getElementById('reg-confirm').value;
+        const confirm  = document.getElementById('reg-confirm').value;
 
         if (!name || !email || !phone || !password) return showAlert('register-alert', 'Please fill in all required fields');
         if (role === 'DONOR' && !blood) return showAlert('register-alert', 'Blood group is required for donors');
         if (password !== confirm) return showAlert('register-alert', 'Passwords do not match');
         if (password.length < 8) return showAlert('register-alert', 'Password must be at least 8 characters');
 
+        // ── DOCTOR: multipart registration ──────────────────────────────
+        if (role === 'DOCTOR') {
+            const licenceFile = document.getElementById('reg-licence-file').files[0];
+            const degreeFile  = document.getElementById('reg-degree-file').files[0];
+            if (!licenceFile) return showAlert('register-alert', 'Please upload your medical licence');
+            if (!degreeFile)  return showAlert('register-alert', 'Please upload your degree certificate');
+
+            setLoading('register-btn', true);
+            try {
+                const fd = new FormData();
+                fd.append('fullName', name);
+                fd.append('email', email);
+                fd.append('phone', phone);
+                fd.append('password', password);
+                fd.append('medicalLicence', licenceFile);
+                fd.append('degreeCertificate', degreeFile);
+
+                const res = await fetch(API + '/auth/register-doctor', {
+                    method: 'POST',
+                    body: fd
+                    // Do NOT set Content-Type — browser sets it with the correct boundary
+                });
+
+                const text = await res.text();
+                let data;
+                try { data = JSON.parse(text); } catch { data = { message: text }; }
+                if (!res.ok) throw new Error(data.message || 'Registration failed');
+
+                showToast('Doctor account submitted! An admin will verify your credentials.', 'success');
+                switchTab('login');
+                document.getElementById('login-email').value = email;
+                document.getElementById('login-password').focus();
+            } catch(e) {
+                showAlert('register-alert', e.message);
+            } finally {
+                setLoading('register-btn', false, 'Create Account');
+            }
+            return;
+        }
+
+        // ── DONOR / PATIENT: JSON registration ─────────────────────────
         setLoading('register-btn', true);
         const body = { fullName: name, role, email, phone, password, bloodGroup: blood || null };
         try {
@@ -1398,7 +1388,7 @@
         roleEl.textContent = currentUser.role;
         roleEl.className = 'dash-role';
         if (currentUser.role === 'DOCTOR') roleEl.classList.add('role-doctor');
-        if (currentUser.role === 'ADMIN') roleEl.classList.add('role-admin');
+        if (currentUser.role === 'ADMIN')  roleEl.classList.add('role-admin');
 
         buildSidebar(currentUser.role);
         navigateDash('overview');
@@ -1465,11 +1455,9 @@
         const firstName = currentUser?.fullName?.split(' ')[0] || 'there';
         document.getElementById('overview-sub').textContent = `Hello, ${firstName} 👋`;
 
-        // Eligibility card for donors
         const eligContainer = document.getElementById('eligibility-card-container');
         if (role === 'DONOR') {
             const eligible = isEligible();
-            const nextDate = currentUser?.nextEligibleDonationDate;
             eligContainer.innerHTML = `
                 <div class="eligibility-card ${eligible ? '' : 'not-eligible'}">
                     <div class="elig-icon">${eligible ? '✅' : '⏳'}</div>
@@ -1478,13 +1466,12 @@
                             ${eligible ? 'You are eligible to donate!' : 'Not eligible to donate yet'}
                         </div>
                         <div class="elig-sub">
-                            ${eligible ? 'Find an approved request and schedule your donation.' : 'Next eligible date: ' + formatDate(nextDate)}
+                            ${eligible ? 'Find an approved request and schedule your donation.'
+                                       : 'Next eligible date: ' + formatDate(currentUser.nextEligibleDonationDate)}
                         </div>
                     </div>
                 </div>`;
-        } else {
-            eligContainer.innerHTML = '';
-        }
+        } else { eligContainer.innerHTML = ''; }
 
         let statsHtml = '', activityHtml = '';
         try {
@@ -1501,8 +1488,7 @@
                 statsHtml = `
                     <div class="dash-stat"><div class="dash-stat-num">${dons.length}</div><div class="dash-stat-label">Total Donations</div></div>
                     <div class="dash-stat stat-success"><div class="dash-stat-num">${dons.filter(d=>d.status==='COMPLETED').length}</div><div class="dash-stat-label">Completed</div></div>
-                    <div class="dash-stat stat-warning"><div class="dash-stat-num">${dons.filter(d=>d.status==='SCHEDULED').length}</div><div class="dash-stat-label">Scheduled</div></div>
-                    <div class="dash-stat"><div class="dash-stat-num">${dons.filter(d=>d.status==='CANCELLED').length}</div><div class="dash-stat-label">Cancelled</div></div>`;
+                    <div class="dash-stat stat-warning"><div class="dash-stat-num">${dons.filter(d=>d.status==='SCHEDULED').length}</div><div class="dash-stat-label">Scheduled</div></div>`;
                 activityHtml = renderDonationList(dons.slice(0, 5));
             } else if (role === 'DOCTOR' || role === 'ADMIN') {
                 const pending = await apiFetch('/requests/pending');
@@ -1548,24 +1534,19 @@
     }
 
     async function loadAvailableRequests() {
-        // Show eligibility banner
         const banner = document.getElementById('donor-eligibility-banner');
         if (!isEligible()) {
             banner.innerHTML = `<div class="alert alert-warning" style="margin-bottom:20px">
                 ⏳ You are not eligible to donate until <strong>${formatDate(currentUser.nextEligibleDonationDate)}</strong>.
-                You can still browse available requests.
             </div>`;
         } else {
-            banner.innerHTML = `<div class="alert alert-success" style="margin-bottom:20px">
-                ✅ You are eligible to donate! Find a request below and click Donate.
-            </div>`;
+            banner.innerHTML = `<div class="alert alert-success" style="margin-bottom:20px">✅ You are eligible to donate! Find a request below.</div>`;
         }
-
         try {
             const reqs = await apiFetch('/requests/approved');
             document.getElementById('available-list').innerHTML = reqs.length
                 ? renderRequestList(reqs, 'donor')
-                : '<div class="empty-state"><span class="empty-icon">🔍</span><div class="empty-text">No approved requests available right now.<br>Check back soon — new requests are added daily.</div></div>';
+                : '<div class="empty-state"><span class="empty-icon">🔍</span><div class="empty-text">No approved requests available right now.</div></div>';
         } catch(e) {
             document.getElementById('available-list').innerHTML = `<div class="alert alert-error">${e.message}</div>`;
         }
@@ -1581,10 +1562,7 @@
         let html = '<div class="request-progress" style="margin-top:8px">';
         steps.forEach((s, i) => {
             const cls = s.done ? 'done' : (i === steps.findIndex(x => !x.done) ? 'active' : '');
-            html += `<div class="prog-step ${cls}">
-                <div class="prog-dot">${s.done ? '✓' : (i+1)}</div>
-                <span style="display:none">${s.label}</span>
-            </div>`;
+            html += `<div class="prog-step ${cls}"><div class="prog-dot">${s.done ? '✓' : (i+1)}</div></div>`;
             if (i < steps.length - 1) html += `<div class="prog-line ${s.done ? 'done' : ''}"></div>`;
         });
         html += '</div>';
@@ -1609,34 +1587,28 @@
 
             let actions = '';
             if (viewAs === 'patient') {
-                if (r.status === 'PENDING' && !r.hasDocuments) {
+                if (r.status === 'PENDING' && !r.hasDocuments)
                     actions = `<button class="btn-sm btn-sm-primary" onclick="openUploadDocs(${r.id})">📎 Upload Docs</button>`;
-                } else if (r.status === 'PENDING' && r.hasDocuments && !r.documentsVerified) {
+                else if (r.status === 'PENDING' && r.hasDocuments && !r.documentsVerified)
                     actions = `<span class="badge badge-pending">⏳ Awaiting Doctor</span>`;
-                } else if (r.status === 'APPROVED') {
+                else if (r.status === 'APPROVED')
                     actions = `<span class="badge badge-approved">✓ Waiting for Donor</span>`;
-                }
             }
 
             if (viewAs === 'doctor') {
-                if (r.hasDocuments && !r.documentsVerified) {
+                if (r.hasDocuments && !r.documentsVerified)
                     actions += `<button class="btn-sm btn-sm-warning" onclick="verifyDocs(${r.id})">✓ Verify Docs</button>`;
-                }
                 if (r.documentsVerified && r.status === 'PENDING') {
                     actions += `<button class="btn-sm btn-sm-success" onclick="approveRequest(${r.id})">✓ Approve</button>`;
                     actions += `<button class="btn-sm btn-sm-outline" onclick="rejectRequest(${r.id})">✗ Reject</button>`;
                 }
-                if (!r.hasDocuments) {
-                    actions = `<span class="badge badge-pending">Awaiting Docs</span>`;
-                }
+                if (!r.hasDocuments) actions = `<span class="badge badge-pending">Awaiting Docs</span>`;
             }
 
             if (viewAs === 'donor' && r.status === 'APPROVED') {
-                if (isEligible()) {
-                    actions = `<button class="btn-sm btn-sm-primary" onclick="openScheduleDonation(${r.id}, '${bloodLabel(r.bloodGroup)}', '${(r.hospitalName||'').replace(/'/g,"\\'")}')">🩸 Donate</button>`;
-                } else {
-                    actions = `<span class="badge badge-pending">Not Eligible Yet</span>`;
-                }
+                actions = isEligible()
+                    ? `<button class="btn-sm btn-sm-primary" onclick="openScheduleDonation(${r.id}, '${bloodLabel(r.bloodGroup)}', '${(r.hospitalName||'').replace(/'/g,"\\'")}')">🩸 Donate</button>`
+                    : `<span class="badge badge-pending">Not Eligible Yet</span>`;
             }
 
             const progress = viewAs === 'patient' ? renderRequestProgress(r) : '';
@@ -1659,10 +1631,7 @@
 
     function openCreateRequestModal() {
         clearAlert('create-request-alert');
-        ['cr-blood','cr-units','cr-hospital','cr-address'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = '';
-        });
+        ['cr-blood','cr-units','cr-hospital','cr-address'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
         document.getElementById('create-request-modal').classList.add('active');
     }
 
@@ -1674,7 +1643,7 @@
         const address = document.getElementById('cr-address').value.trim();
 
         if (!blood) return showAlert('create-request-alert', 'Please select a blood group');
-        if (!units || units < 1) return showAlert('create-request-alert', 'Please enter a valid number of units (1–10)');
+        if (!units || units < 1) return showAlert('create-request-alert', 'Please enter a valid number of units');
         if (!hospital) return showAlert('create-request-alert', 'Please enter the hospital name');
         if (!address) return showAlert('create-request-alert', 'Please enter the hospital address');
 
@@ -1710,49 +1679,43 @@
         name.textContent = '✓ ' + file.name;
     }
 
-async function uploadDocuments() {
-    clearAlert('upload-alert');
+    async function uploadDocuments() {
+        clearAlert('upload-alert');
+        const requestId = document.getElementById('upload-request-id').value;
+        const prescription = document.getElementById('prescription-file').files[0];
+        const hospitalProof = document.getElementById('hospital-file').files[0];
+        if (!prescription) return showAlert('upload-alert', 'Please select a prescription file');
+        if (!hospitalProof) return showAlert('upload-alert', 'Please select a hospital proof file');
 
-    const requestId = document.getElementById('upload-request-id').value;
-    const prescription = document.getElementById('prescription-file').files[0];
-    const hospitalProof = document.getElementById('hospital-file').files[0];
+        setLoading('upload-btn', true);
+        try {
+            const fd = new FormData();
+            fd.append('prescription', prescription);
+            fd.append('hospitalProof', hospitalProof);
 
-    if (!prescription) return showAlert('upload-alert', 'Please select a prescription file');
-    if (!hospitalProof) return showAlert('upload-alert', 'Please select a hospital proof file');
+            const res = await fetch(`${API}/requests/${requestId}/documents`, {
+                method: 'POST',
+                headers: authToken ? { 'Authorization': 'Bearer ' + authToken } : {},
+                body: fd
+            });
 
-    setLoading('upload-btn', true);
+            const text = await res.text();
+            if (!res.ok) {
+                let errorMsg = 'Upload failed';
+                try { errorMsg = JSON.parse(text).message || errorMsg; } catch {}
+                throw new Error(errorMsg);
+            }
 
-    try {
-        const fd = new FormData();
-        fd.append('prescription', prescription);
-        fd.append('hospitalProof', hospitalProof);
-
-        // Use the correct endpoint that updates the DB
-        const res = await fetch(`${API}/requests/${requestId}/documents`, {
-            method: 'POST',
-            headers: authToken ? { 'Authorization': 'Bearer ' + authToken } : {},
-            body: fd
-        });
-
-        const text = await res.text(); // handle plain text response
-        console.log('Upload response:', res.status, text);
-
-        if (!res.ok) {
-            let errorMsg = 'Upload failed';
-            try { errorMsg = JSON.parse(text).message || errorMsg; } catch {}
-            throw new Error(errorMsg);
+            closeModal('upload-docs-modal');
+            showToast('Documents uploaded! A doctor will review your request shortly.', 'success');
+            loadMyRequests();
+        } catch(e) {
+            showAlert('upload-alert', e.message);
+        } finally {
+            setLoading('upload-btn', false, 'Upload Documents');
         }
-
-        closeModal('upload-docs-modal');
-        showToast('Documents uploaded! A doctor will review your request shortly.', 'success');
-        loadMyRequests();
-
-    } catch(e) {
-        showAlert('upload-alert', e.message);
-    } finally {
-        setLoading('upload-btn', false, 'Upload Documents');
     }
-}
+
     async function verifyDocs(requestId) {
         if (!confirm('Mark documents as verified for request #' + requestId + '?')) return;
         try {
@@ -1763,7 +1726,7 @@ async function uploadDocuments() {
     }
 
     async function approveRequest(requestId) {
-        if (!confirm('Approve blood request #' + requestId + '? This will make it visible to eligible donors.')) return;
+        if (!confirm('Approve blood request #' + requestId + '?')) return;
         try {
             await apiFetch(`/requests/${requestId}/approve`, { method: 'POST' });
             showToast('Request approved! Eligible donors can now see it.', 'success');
@@ -1817,55 +1780,45 @@ async function uploadDocuments() {
         }).join('');
     }
 
-   async function openScheduleDonation(requestId, bloodGroup, hospital) {
-    clearAlert('schedule-alert');
-    document.getElementById('schedule-request-id').value = requestId;
-    document.getElementById('schedule-units').value = '';
-    document.getElementById('schedule-request-info').innerHTML =
-        `<strong>${bloodGroup} blood</strong> needed at <strong>${hospital}</strong><br>
-        <small style="color:var(--muted)">Request #${requestId}</small>`;
+    async function openScheduleDonation(requestId, bloodGroup, hospital) {
+        clearAlert('schedule-alert');
+        document.getElementById('schedule-request-id').value = requestId;
+        document.getElementById('schedule-units').value = '';
+        document.getElementById('schedule-request-info').innerHTML =
+            `<strong>${bloodGroup} blood</strong> needed at <strong>${hospital}</strong><br>
+            <small style="color:var(--muted)">Request #${requestId}</small>`;
 
-    // Check if already scheduled for this request
-    try {
-        const myDonations = await apiFetch('/donations/my');
-        const existing = myDonations.find(
-            d => d.bloodRequestId === requestId && d.status === 'SCHEDULED'
-        );
-
-        if (existing) {
-            showAlert('schedule-alert', 'You already have a scheduled donation for this request', 'warning');
-            document.getElementById('schedule-btn').style.display = 'none';
-
-            // Inject cancel button if not already there
-            if (!document.getElementById('cancel-existing-btn')) {
-                const cancelBtn = document.createElement('button');
-                cancelBtn.id = 'cancel-existing-btn';
-                cancelBtn.className = 'btn-full';
-                cancelBtn.style.cssText = 'background:var(--slate);margin-top:8px';
-                cancelBtn.textContent = '✕ Cancel My Donation';
-                cancelBtn.onclick = async () => {
-                    if (!confirm('Cancel donation #' + existing.id + '?')) return;
-                    try {
-                        await apiFetch(`/donations/${existing.id}/cancel`, { method: 'POST' });
-                        showToast('Donation cancelled', 'warning');
-                        closeModal('schedule-donation-modal');
-                        loadMyDonations();
-                        loadAvailableRequests();
-                    } catch(e) { showToast(e.message, 'error'); }
-                };
-                document.getElementById('schedule-btn').parentNode.appendChild(cancelBtn);
+        try {
+            const myDonations = await apiFetch('/donations/my');
+            const existing = myDonations.find(d => d.bloodRequestId === requestId && d.status === 'SCHEDULED');
+            if (existing) {
+                showAlert('schedule-alert', 'You already have a scheduled donation for this request', 'warning');
+                document.getElementById('schedule-btn').style.display = 'none';
+                if (!document.getElementById('cancel-existing-btn')) {
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.id = 'cancel-existing-btn';
+                    cancelBtn.className = 'btn-full';
+                    cancelBtn.style.cssText = 'background:var(--slate);margin-top:8px';
+                    cancelBtn.textContent = '✕ Cancel My Donation';
+                    cancelBtn.onclick = async () => {
+                        if (!confirm('Cancel donation #' + existing.id + '?')) return;
+                        try {
+                            await apiFetch(`/donations/${existing.id}/cancel`, { method: 'POST' });
+                            showToast('Donation cancelled', 'warning');
+                            closeModal('schedule-donation-modal');
+                            loadMyDonations(); loadAvailableRequests();
+                        } catch(e) { showToast(e.message, 'error'); }
+                    };
+                    document.getElementById('schedule-btn').parentNode.appendChild(cancelBtn);
+                }
+            } else {
+                document.getElementById('schedule-btn').style.display = '';
+                document.getElementById('cancel-existing-btn')?.remove();
             }
-        } else {
-            // Clean state — show confirm, hide cancel
-            document.getElementById('schedule-btn').style.display = '';
-            document.getElementById('cancel-existing-btn')?.remove();
-        }
-    } catch(e) {
-        // If check fails, just show the modal normally
-    }
+        } catch(e) {}
 
-    document.getElementById('schedule-donation-modal').classList.add('active');
-}
+        document.getElementById('schedule-donation-modal').classList.add('active');
+    }
 
     async function scheduleDonation() {
         clearAlert('schedule-alert');
@@ -1887,7 +1840,7 @@ async function uploadDocuments() {
     }
 
     async function completeDonation(donationId) {
-        if (!confirm('Mark donation #' + donationId + ' as completed? This will update your next eligible donation date.')) return;
+        if (!confirm('Mark donation #' + donationId + ' as completed?')) return;
         try {
             await apiFetch('/donations/complete', { method: 'POST', body: JSON.stringify({ donationId }) });
             showToast('Donation completed! You saved a life today ❤️', 'success');
@@ -1897,7 +1850,7 @@ async function uploadDocuments() {
     }
 
     async function cancelDonation(donationId) {
-        if (!confirm('Cancel donation #' + donationId + '? The request will return to available.')) return;
+        if (!confirm('Cancel donation #' + donationId + '?')) return;
         try {
             await apiFetch(`/donations/${donationId}/cancel`, { method: 'POST' });
             showToast('Donation cancelled', 'warning');
@@ -1916,19 +1869,28 @@ async function uploadDocuments() {
                 container.innerHTML = '<div class="empty-state"><span class="empty-icon">👨‍⚕️</span><div class="empty-text">No pending doctor verifications</div></div>';
                 return;
             }
-            container.innerHTML = docs.map(d => `
-                <div class="request-item">
+            container.innerHTML = docs.map(d => {
+                // Build doc links if available
+                const docLinks = (d.medicalLicenceUrl || d.degreeCertificateUrl) ? `
+                    <div class="doc-links" style="margin-top:8px">
+                        ${d.medicalLicenceUrl ? `<a class="doc-link" href="${API.replace('/api','')}${d.medicalLicenceUrl}" target="_blank">📜 Medical Licence</a>` : ''}
+                        ${d.degreeCertificateUrl ? `<a class="doc-link" href="${API.replace('/api','')}${d.degreeCertificateUrl}" target="_blank">🎓 Degree Certificate</a>` : ''}
+                    </div>` : '<div style="margin-top:6px;font-size:0.78rem;color:var(--warning)">⚠ No documents uploaded</div>';
+
+                return `<div class="request-item">
                     <div class="req-blood" style="font-size:1.3rem;background:rgba(61,61,70,0.07);color:var(--slate)">👨‍⚕️</div>
                     <div class="req-info">
                         <div class="req-hospital">${d.fullName}</div>
                         <div class="req-meta">${d.email} · ${d.phone}</div>
-                        <div style="margin-top:6px"><span class="badge badge-pending">⏳ Pending Verification</span></div>
+                        ${docLinks}
+                        <div style="margin-top:8px"><span class="badge badge-pending">⏳ Pending Verification</span></div>
                     </div>
                     <div class="req-actions">
                         <button class="btn-sm btn-sm-success" onclick="verifyDoctor(${d.id}, true)">✓ Approve</button>
                         <button class="btn-sm btn-sm-outline" onclick="verifyDoctor(${d.id}, false)">✗ Reject</button>
                     </div>
-                </div>`).join('');
+                </div>`;
+            }).join('');
         } catch(e) {
             document.getElementById('pending-doctors-list').innerHTML = `<div class="alert alert-error">${e.message}</div>`;
         }
@@ -1938,7 +1900,7 @@ async function uploadDocuments() {
         if (!confirm(`${approved ? 'Approve' : 'Reject'} this doctor?`)) return;
         try {
             await apiFetch('/users/doctors/verify', { method: 'POST', body: JSON.stringify({ doctorId, approved }) });
-            showToast(`Doctor ${approved ? 'approved — they can now review requests' : 'rejected'}`, approved ? 'success' : 'warning');
+            showToast(`Doctor ${approved ? 'approved — they can now log in and review requests' : 'rejected'}`, approved ? 'success' : 'warning');
             loadPendingDoctors();
         } catch(e) { showToast(e.message, 'error'); }
     }

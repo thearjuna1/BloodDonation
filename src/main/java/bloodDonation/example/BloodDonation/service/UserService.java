@@ -1,4 +1,5 @@
 package bloodDonation.example.BloodDonation.service;
+
 import bloodDonation.example.BloodDonation.dto.UserDto;
 import bloodDonation.example.BloodDonation.entity.User;
 import bloodDonation.example.BloodDonation.repository.UserRepository;
@@ -86,7 +87,6 @@ public class UserService {
                 .stream().map(this::mapToResponse).toList();
     }
 
-
     public String hashSensitiveData(String rawData) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -109,6 +109,11 @@ public class UserService {
         res.setAdminVerified(user.isAdminVerified());
         res.setNextEligibleDonationDate(user.getNextEligibleDonationDate());
         res.setCreatedAt(user.getCreatedAt());
+
+        // Include doctor document URLs so admin can review them
+        res.setMedicalLicenceUrl(user.getMedicalLicenceUrl());
+        res.setDegreeCertificateUrl(user.getDegreeCertificateUrl());
+
         return res;
     }
 }

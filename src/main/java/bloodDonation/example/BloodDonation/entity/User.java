@@ -1,10 +1,12 @@
 package bloodDonation.example.BloodDonation.entity;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -16,6 +18,7 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor
 @Builder
 public class User implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,6 +42,14 @@ public class User implements UserDetails {
     @Builder.Default
     private boolean accountLocked = false;
 
+    // ── Doctor verification documents ──────────────────────────────────────
+    /** Stored URL of the uploaded medical licence (doctors only). */
+    private String medicalLicenceUrl;
+
+    /** Stored URL of the uploaded degree certificate (doctors only). */
+    private String degreeCertificateUrl;
+    // ───────────────────────────────────────────────────────────────────────
+
     private LocalDate nextEligibleDonationDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -46,6 +57,11 @@ public class User implements UserDetails {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 
@@ -59,36 +75,34 @@ public class User implements UserDetails {
         return email;
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+    @Override public boolean isAccountNonExpired()     { return true; }
+    @Override public boolean isAccountNonLocked()      { return !accountLocked; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return !accountLocked;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
+    /**
+     * Doctors are only "enabled" (can log in) once the admin has approved them.
+     * All other roles are enabled as soon as their email is verified.
+     */
     @Override
     public boolean isEnabled() {
+        if (role == Role.DOCTOR) {
+            return emailVerified && adminVerified;
+        }
         return emailVerified;
     }
 
     public boolean isDonorEligible() {
         return nextEligibleDonationDate == null ||
-                !java.time.LocalDate.now().isBefore(nextEligibleDonationDate);
+                !LocalDate.now().isBefore(nextEligibleDonationDate);
     }
 
     public boolean isVerifiedDoctor() {
         return role == Role.DOCTOR && adminVerified;
     }
 
-    public enum Role {ADMIN, DOCTOR, DONOR, PATIENT}
+    // ── Enums ───────────────────────────────────────────────────────────────
+
+    public enum Role { ADMIN, DOCTOR, DONOR, PATIENT }
 
     public enum BloodGroup {
         O_NEG, A_NEG, B_NEG, O_POS, A_POS, B_POS, AB_NEG, AB_POS;

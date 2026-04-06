@@ -42,11 +42,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public pages
                         .requestMatchers("/", "/index.html", "/*.js", "/*.css", "/*.png", "/*.html").permitAll()
-                        // Auth endpoints
-                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-                        // File serving
+                        // Auth endpoints — including doctor registration (multipart)
+                        .requestMatchers(
+                                "/api/auth/register",
+                                "/api/auth/register-doctor",
+                                "/api/auth/login"
+                        ).permitAll()
+                        // File serving (prescriptions, doctor docs, etc.)
                         .requestMatchers("/api/files/**").permitAll()
-                        // Everything else requires auth
+                        // Everything else requires authentication
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
